@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ajio</title>
+    <script src="{{url_for('static',filename='jquery.js')}}"></script>
+</head>
+
+
+<body>
+    <!------------Navbar------------>
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+        <a class="navbar-brand" href="#">
+            <img src="{{url_for('static', filename='img/Ajio-Logo.svg')}}" Website\env\static\img\ width="50" height="50" >
+        </a>
+    </nav>
+
+    <!---------Update and Upload section------->
+    <section id="update">
+        <form class="form-inline" action="{{url_for('filtervalues')}}" method="POST" id="filtervalues">
+            <div class="container">
+                <table>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <input type="text" name="Segment" placeholder="Segment" size="10" list="Segment" >
+                                <datalist id="Segment">
+                                  
+                                </datalist>
+                                <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="text" name="Portfolio" placeholder="Portfolio" size="10" list="Portfolio" >
+                            <datalist id="Portfolio">
+                              
+                            </datalist>
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="text" name="Brand" placeholder="Brand" size="10" list="Brand" style="width: 120px;" >
+                            <datalist id="Brand">
+                               
+                            </datalist>
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="text" name="Brick" placeholder="Brick" size="10" list="Brick" >
+                            <datalist id="Brick">
+                            </datalist>
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="MRPMIN" placeholder="MRP Min" size="7" maxlength="7" style="width: 100px;" >
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="MRPMAX" placeholder="MRP Max" size="7" maxlength="7" style="width: 100px;" >
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="TDMIN" placeholder="TD % Min" size="7" maxlength="3" style="width: 100px;">
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="TDMAX" placeholder="TD % Max" size="7" maxlength="3" style="width: 100px;">
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="DOH" placeholder="DOH" size="7" maxlength="7" style="width: 100px;">
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <input type="number" name="Ageing" placeholder="Ageing" size="7" maxlength="7" style="width: 100px;">
+                            <div class="validate"></div>
+                        </td>
+                        <td>
+                            <button type="submit" class="button">Update</button>
+                        </td>
+            </div>
+            </tr>
+            </table>
+        </form>
+
+        <table id=uploadsec>
+            <tr>
+                <td>
+                    <form>
+                        <input type="radio" id="revenue" name="resetdeltadiscount" value="revenue">
+                        <label for="Revenue">Revenue</label><br>
+                        <input type="radio" id="grossmargins" name="resetdeltadiscount" value="grossmargins">
+                        <label for="Gross Margins">Gross Margins</label>
+                        <br>
+                        <button type="button" class="button">Reset Delta Discount</button>
+                    </form>
+
+                </td>
+                <td>
+                    <form action="/datafromcsv" method="POST" id="uploadFile">
+                        <input type="file" id="uploadedFile" name="filename" accept=".csv" >
+                        <br>
+                        <input type="submit" class="button" value="Submit" style="margin-top: 10px;">
+                    </form>
+                </td>
+            </tr>
+        </table>
+        </div>
+
+    </section>
+    <!-------Table Section-->
+    <section id="table">
+        <div class="container">
+            <table id="Discount-table">
+                <thead>
+                    <th>Date</th>
+                    <th>Option ID</th>
+                    <th>Trade Discount</th>
+                    <th>Coupon Discount</th>
+                    <th>Total Discount</th>
+                    <th>Booked MRP</th>
+                    <th>Booked Revenue</th>
+                    <th>Booked Quantity</th>
+                    <th>RGM</th>
+                    <th>GM %</th>
+                    <th>Predicted Quantity</th>
+                    <th>Optimal Discount</th>
+                    <th>Discount
+                        <br>
+                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                    </th>
+                </thead>
+                <tbody>
+                   
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded",event=>{
+                fetch("/dropdown")
+                .then(res=>{
+                    // console.log(res)
+                    return res.json()
+                })
+                .then(data=>{
+                    console.log(data)   
+                    
+                    let html1=''
+                    let html2=''
+                    let html3=''
+                    let html4=''
+
+                    data.Segment.forEach(item=>{
+                        html1+=`<option value="${item}">${item}</option>`
+                    })
+                    data.Portfolio.forEach(item=>{
+                        html2+=`<option value="${item}">${item}</option>`
+                    })
+                    data.Brand.forEach(item=>{
+                        html3+=`<option value="${item}">${item}</option>`
+                    })
+                    data.Brick.forEach(item=>{
+                        html4+=`<option value="${item}">${item}</option>`
+                    })
+ 
+                    
+                    document.querySelector("#Segment").innerHTML = html1
+                    document.querySelector("#Portfolio").innerHTML = html2
+                    document.querySelector("#Brand").innerHTML = html3
+                    document.querySelector("#Brick").innerHTML = html4
+                });
+                
+        })
+
+        //Population of the table
+        window.addEventListener("DOMContentLoaded",event=>{
+                fetch("/table")
+                .then(res=>{
+                    // console.log(res)
+                    return res.json()
+                })
+                .then(data=>{
+                    console.log(data)   
+                    let html=''
+                        for ( var i = 0; i < data.Date.length; i++) {
+                        html+=`<tr>`
+                        html+=`<td>${data.Date[i]}</td>`
+                        html+=`<td>${data.OptionID[i]}</td>`
+                        html+=`<td>${data.TradeDiscount[i]}</td>`
+                        html+=`<td>${data.CouponDiscount[i]}</td>`
+                        html+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
+                        html+=`<td>${data.BookedMRP[i]}</td>`
+                        html+=`<td>${data.BookedRevenue[i]}</td>`
+                        html+=`<td>${data.BookedQuantity[i]}</td>`
+                        html+=`<td>${data.RGM[i]}</td>`
+                        html+=`<td>${data.GM[i]}</td>`
+                        html+=`<td>${data.PredictedQuant[i]}</td>`
+                        html+=`<td>${data.OptimalDiscount[i]}</td>`
+                        html+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
+                        html+=`</tr>`
+
+                        
+                    }
+                    document.querySelector("#Discount-table tbody").innerHTML = html
+                ////////Slider
+                for ( var i = 0; i < data.Date.length; i++) {
+                    let slider = document.getElementById(`myRange${[i]}`);
+                    let output = document.getElementById(`${[i]}`);
+                    // console.log(slider.value) // Display the default slider value
+
+                    // Update the current slider value (each time you drag the slider handle)
+                    slider.oninput = function() {
+                        
+                    // output.innerHTML = this.value;
+                    console.log(output)
+                        let idx = parseInt(this.id.substr(7))
+                        let initial = data.TotalDiscount[idx]
+                        let delta = this.value
+                        // console.log(initial)
+                        // console.log(delta)
+                        // console.log(typeof(initial))
+                        // console.log(typeof(delta))
+                        output.innerText = parseFloat(initial) + parseFloat(delta)
+
+                    // console.log(this.value)
+                    }
+                    }
+                
+                });
+                
+                
+        })
+
+        ///////Input File
+        // var fileInput = document.getElementById("uploadedFile"),
+
+        // readFile = function () {
+        //     var reader = new FileReader();
+        //     reader.onload = function () {
+        //         console.log('hello')
+        //         console.log(reader.result)
+        //         // document.getElementById('out').innerHTML = reader.result;
+        //     };
+        //     // start reading the file. When it is done, calls the onload event defined above.
+        //     reader.readAsBinaryString(fileInput.files[0]);
+        // };
+
+        // fileInput.addEventListener('change', readFile);
+        
+
+        /////Filter values
+        window.addEventListener("DOMContentLoaded",e=>{
+            let filterForm = document.querySelector("#filtervalues") 
+            filterForm.addEventListener("submit",(event)=>{
+                console.log('req is sent')
+                event.preventDefault()
+                const Segment = filterForm["Segment"].value
+                const Portfolio = filterForm["Portfolio"].value
+                const Brand = filterForm["Brand"].value
+                const Brick = filterForm["Brick"].value
+                const MRPMIN = filterForm["MRPMIN"].value
+                const MRPMAX = filterForm["MRPMAX"].value
+                const TDMIN = filterForm["TDMIN"].value
+                const TDMAX = filterForm["TDMAX"].value
+                const DOH = filterForm["DOH"].value
+                const Ageing = filterForm["Ageing"].value
+
+                console.log(Segment, Portfolio,MRPMIN,MRPMAX,Brand,Brick,TDMAX,TDMIN,DOH,Ageing)
+
+
+
+                let options = {
+                    method : "POST",
+                    body: JSON.stringify({
+                        "Segment": Segment,
+                        "Portfolio": Portfolio,
+                        "Brand": Brand,
+                        "Brick": Brick,
+                        "MRPMIN": MRPMIN,
+                        "MRPMAX": MRPMAX,
+                        "TDMIN": TDMIN,
+                        "TDMAX": TDMAX,
+                        "DOH": DOH,
+                        "Ageing": Ageing
+                    }),
+                    headers: {
+                        "Content-type" : "application/json"
+                    }
+                }
+                fetch("/filtervalues",options)
+                .then(resp=>{
+                    console.log('helllllllloooooooo')
+
+                    // console.log(resp)
+                    return resp.json()
+                })
+                .then(data=>{
+                    console.log(data)
+                    let html1=''
+                    for ( var i = 0; i < data.Date.length; i++) {
+                    html1+=`<tr>`
+                    html1+=`<td>${data.Date[i]}</td>`
+                    html1+=`<td>${data.OptionID[i]}</td>`
+                    html1+=`<td>${data.TradeDiscount[i]}</td>`
+                    html1+=`<td>${data.CouponDiscount[i]}</td>`
+                    html1+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
+                    html1+=`<td>${data.BookedMRP[i]}</td>`
+                    html1+=`<td>${data.BookedRevenue[i]}</td>`
+                    html1+=`<td>${data.BookedQuantity[i]}</td>`
+                    html1+=`<td>${data.RGM[i]}</td>`
+                    html1+=`<td>${data.GM[i]}</td>`
+                    html1+=`<td>${data.PredictedQuant[i]}</td>`
+                    html1+=`<td>${data.OptimalDiscount[i]}</td>`
+                    html1+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
+                    html1+=`</tr>`
+                    }
+                    console.log(html1)
+                    document.querySelector("#Discount-table tbody").innerHTML = html1
+                     ////////Slider
+                        for ( var i = 0; i < data.Date.length; i++) {
+                            let slider = document.getElementById(`myRange${[i]}`);
+                            let output = document.getElementById(`${[i]}`);
+                            // console.log(slider.value) // Display the default slider value
+
+                            // Update the current slider value (each time you drag the slider handle)
+                            slider.oninput = function() {
+                                
+                            // output.innerHTML = this.value;
+                            console.log(output)
+                                let idx = parseInt(this.id.substr(7))
+                                let initial = data.TotalDiscount[idx]
+                                let delta = this.value
+                                output.innerText = parseFloat(initial) + parseFloat(delta)
+
+                            // console.log(this.value)
+                            }
+                            }
+                })
+      
+            })
+                    
+        })
+        /////When a file is uploaded this filtered data api is called
+        window.addEventListener("DOMContentLoaded",e=>{
+            let uploadForm = document.querySelector("#uploadFile") 
+            
+            uploadForm.addEventListener("submit",(event)=>{
+                var input = uploadForm.querySelector('input[type="file"]')
+                console.log(input)
+                var data = new FormData()
+                data.append('filename', input.files[0])
+                console.log('req for upload is sent')
+                event.preventDefault()
+                fetch("/datafromcsv",{
+                    method:"POST",
+                   
+                    body: data
+                })
+                .then(resp=>{
+                    console.log('hello from csv')
+
+                    // console.log(resp)
+                    return resp.json()
+
+                })
+                .then(data=>{
+                    console.log(data)
+                    let html1=''
+                    for ( var i = 0; i < data.Date.length; i++) {
+                    html1+=`<tr>`
+                    html1+=`<td>${data.Date[i]}</td>`
+                    html1+=`<td>${data.OptionID[i]}</td>`
+                    html1+=`<td>${data.TradeDiscount[i]}</td>`
+                    html1+=`<td>${data.CouponDiscount[i]}</td>`
+                    html1+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
+                    html1+=`<td>${data.BookedMRP[i]}</td>`
+                    html1+=`<td>${data.BookedRevenue[i]}</td>`
+                    html1+=`<td>${data.BookedQuantity[i]}</td>`
+                    html1+=`<td>${data.RGM[i]}</td>`
+                    html1+=`<td>${data.GM[i]}</td>`
+                    html1+=`<td>${data.PredictedQuant[i]}</td>`
+                    html1+=`<td>${data.OptimalDiscount[i]}</td>`
+                    html1+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
+                    html1+=`</tr>`
+                    }
+                    console.log(html1)
+                    document.querySelector("#Discount-table tbody").innerHTML = html1
+                     ////////Slider
+                        for ( var i = 0; i < data.Date.length; i++) {
+                            let slider = document.getElementById(`myRange${[i]}`);
+                            let output = document.getElementById(`${[i]}`);
+                            // console.log(slider.value) // Display the default slider value
+
+                            // Update the current slider value (each time you drag the slider handle)
+                            slider.oninput = function() {
+                                
+                            // output.innerHTML = this.value;
+                            console.log(output)
+                                let idx = parseInt(this.id.substr(7))
+                                let initial = data.TotalDiscount[idx]
+                                let delta = this.value
+                                output.innerText = parseFloat(initial) + parseFloat(delta)
+
+                            // console.log(this.value)
+                            }
+                            }
+                })
+            })
+        })
+ // headers: {
+                    //     "Content-type" : "text/csv"
+                    // },
+        
+    </script>
+
+
+
+    <style>
+        th,
+        td {
+            padding: 5px;
+        }
+
+        .row {
+            margin: 10px;
+        }
+
+        #Discount-table {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #Discount-table td,
+        #Discount-table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #Discount-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #Discount-table tr:hover {
+            background-color: #ddd;
+        }
+
+        #Discount-table th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #147cd1;
+            color: white;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            border-radius: 10px;
+            background: black;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: blue;
+            cursor: pointer;
+        }
+
+        th .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgb(253, 253, 253);
+            cursor: pointer;
+        }
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 70%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        table {
+            margin-top: 5px;
+        }
+
+        .container {
+            margin: 5px;
+            align-items: center;
+        }
+
+        img {
+            padding-left: 20px;
+            height: 60px;
+            width: 60px;
+        }
+
+        .column {
+            float: left;
+            width: 25%;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .button {
+            background-color: rgb(58, 55, 228);
+            /* Green */
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        input[type='radio'] {
+            margin-bottom: 10px;
+        }
+
+        #uploadsec td {
+            padding-left: 250px;
+            padding-right: 200px;
+        }
+    </style>
+</body>
+
+</html>

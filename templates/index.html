@@ -4,10 +4,14 @@
 <head>
     <title>Ajio</title>
     <script src="{{url_for('static',filename='jquery.js')}}"></script>
+    <script src="{{url_for('static',filename='jquery2.js')}}"></script>
+    
+   
 </head>
 
 
 <body>
+    
     <!------------Navbar------------>
     <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
         <a class="navbar-brand" href="#">
@@ -109,29 +113,33 @@
     <!-------Table Section-->
     <section id="table">
         <div class="container">
-            <table id="Discount-table">
-                <thead>
-                    <th>Date</th>
-                    <th>Option ID</th>
-                    <th>Trade Discount</th>
-                    <th>Coupon Discount</th>
-                    <th>Total Discount</th>
-                    <th>Booked MRP</th>
-                    <th>Booked Revenue</th>
-                    <th>Booked Quantity</th>
-                    <th>RGM</th>
-                    <th>GM %</th>
-                    <th>Predicted Quantity</th>
-                    <th>Optimal Discount</th>
-                    <th>Discount
-                        <br>
-                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-                    </th>
-                </thead>
-                <tbody>
-                   
-                </tbody>
-            </table>
+            <form action="" method="POST" id="maintable">
+                <table id="Discount-table">
+                    <thead>
+                        <th>Date</th>
+                        <th>Option ID</th>
+                        <th>Trade Discount</th>
+                        <th>Coupon Discount</th>
+                        <th>Total Discount</th>
+                        <th>Booked MRP</th>
+                        <th>Booked Revenue</th>
+                        <th>Booked Quantity</th>
+                        <th>RGM</th>
+                        <th>GM %</th>
+                        <th>Predicted Quantity</th>
+                        <th>Optimal Discount</th>
+                        <th>Discount
+                            <br>
+                            <input type="number" min="-100" max="100" value="0" id="myRange" class="inputnumber">
+                        </th>
+                    </thead>
+                    <tbody>
+                    
+                    </tbody>
+                </table>
+                <!-- <input type="submit" class="button" value="Submit" style="margin-top: 10px; align-content: center; margin-left: 600px;  padding:10px; padding-left: 20px; padding-right: 20px;"> -->
+            </form>
+            <button id="senddatabtn" class="button" style="margin-top: 10px; align-content: center; margin-left: 600px;  padding:10px; padding-left: 20px; padding-right: 20px;">Submit</button><br>
         </div>
     </section>
 
@@ -172,9 +180,13 @@
                 });
                 
         })
-
-        //Population of the table
+   
         window.addEventListener("DOMContentLoaded",event=>{
+            // headers: {
+            //             "Content-type" : "application/json"
+            //         }
+
+            //Population of the table
                 fetch("/table")
                 .then(res=>{
                     // console.log(res)
@@ -185,70 +197,50 @@
                     let html=''
                         for ( var i = 0; i < data.Date.length; i++) {
                         html+=`<tr>`
-                        html+=`<td>${data.Date[i]}</td>`
-                        html+=`<td>${data.OptionID[i]}</td>`
-                        html+=`<td>${data.TradeDiscount[i]}</td>`
-                        html+=`<td>${data.CouponDiscount[i]}</td>`
-                        html+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
-                        html+=`<td>${data.BookedMRP[i]}</td>`
-                        html+=`<td>${data.BookedRevenue[i]}</td>`
-                        html+=`<td>${data.BookedQuantity[i]}</td>`
-                        html+=`<td>${data.RGM[i]}</td>`
-                        html+=`<td>${data.GM[i]}</td>`
-                        html+=`<td>${data.PredictedQuant[i]}</td>`
-                        html+=`<td>${data.OptimalDiscount[i]}</td>`
-                        html+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
-                        html+=`</tr>`
-
-                        
+                        html+=`<td id="date${[i]}">${data.Date[i]}</td>`
+                        html+=`<td id="id${[i]}">${data.OptionID[i]}</td>`
+                        html+=`<td id="tdisc${[i]}">${data.TradeDiscount[i]}</td>`
+                        html+=`<td id="cdisc${[i]}">${data.CouponDiscount[i]}</td>`
+                        html+=`<td id="disc${[i]}" >${data.TotalDiscount[i]}</td>`
+                        html+=`<td id="bookmrp${[i]}">${data.BookedMRP[i]}</td>`
+                        html+=`<td id="bookrev${[i]}">${data.BookedRevenue[i]}</td>`
+                        html+=`<td id="bookquant${[i]}">${data.BookedQuantity[i]}</td>`
+                        html+=`<td id="rgm${[i]}">${data.RGM[i]}</td>`
+                        html+=`<td id="gm${[i]}">${data.GM[i]}</td>`
+                        html+=`<td id="pred${[i]}">${data.PredictedQuant[i]}</td>`
+                        html+=`<td id="optdisc${[i]}">${data.OptimalDiscount[i]}</td>`
+                        html+=`<td><input type="number" min="-100" max="100" value="0" class="inputnumber" id="myRange${[i]}"></td>`
+                        html+=`</tr>`              
                     }
                     document.querySelector("#Discount-table tbody").innerHTML = html
                 ////////Slider
-                for ( var i = 0; i < data.Date.length; i++) {
-                    let slider = document.getElementById(`myRange${[i]}`);
-                    let output = document.getElementById(`${[i]}`);
-                    // console.log(slider.value) // Display the default slider value
+                // for ( var i = 0; i < data.Date.length; i++) {
+                //             let slider = document.getElementById(`myRange${[i]}`);
+                //             let disc = document.getElementById(`disc${[i]}`);
+                //             let predquant = document.getElementById(`pred${[i]}`);
 
-                    // Update the current slider value (each time you drag the slider handle)
-                    slider.oninput = function() {
-                        
-                    // output.innerHTML = this.value;
-                    console.log(output)
-                        let idx = parseInt(this.id.substr(7))
-                        let initial = data.TotalDiscount[idx]
-                        let delta = this.value
-                        // console.log(initial)
-                        // console.log(delta)
-                        // console.log(typeof(initial))
-                        // console.log(typeof(delta))
-                        output.innerText = parseFloat(initial) + parseFloat(delta)
+                //             // console.log(slider.value) // Display the default slider value
 
-                    // console.log(this.value)
-                    }
-                    }
+                //             // Update the current slider value (each time you drag the slider handle)
+                //             slider.oninput = function() {
+                //                 console.log(predquant)
+                //                 let idx = parseInt(this.id.substr(7))
+                //                 let initialdisc = data.TotalDiscount[idx]
+                //                 let initialpredquant= data.PredictedQuant[idx]
+                //                 let initialbookquant= data.BookedQuantity[idx]
+                //                 let delta = this.value
+                //                 disc.innerText = parseFloat(initialdisc) + parseFloat(delta)
+                //                 predquant.innerText= Math.round(parseFloat(initialbookquant)+(parseFloat(delta/100)*parseFloat(initialbookquant)))
+
+                                
+                //             // console.log(this.value)
+                //             }
+                //         }
                 
                 });
                 
                 
         })
-
-        ///////Input File
-        // var fileInput = document.getElementById("uploadedFile"),
-
-        // readFile = function () {
-        //     var reader = new FileReader();
-        //     reader.onload = function () {
-        //         console.log('hello')
-        //         console.log(reader.result)
-        //         // document.getElementById('out').innerHTML = reader.result;
-        //     };
-        //     // start reading the file. When it is done, calls the onload event defined above.
-        //     reader.readAsBinaryString(fileInput.files[0]);
-        // };
-
-        // fileInput.addEventListener('change', readFile);
-        
-
         /////Filter values
         window.addEventListener("DOMContentLoaded",e=>{
             let filterForm = document.querySelector("#filtervalues") 
@@ -299,43 +291,47 @@
                     console.log(data)
                     let html1=''
                     for ( var i = 0; i < data.Date.length; i++) {
-                    html1+=`<tr>`
-                    html1+=`<td>${data.Date[i]}</td>`
-                    html1+=`<td>${data.OptionID[i]}</td>`
-                    html1+=`<td>${data.TradeDiscount[i]}</td>`
-                    html1+=`<td>${data.CouponDiscount[i]}</td>`
-                    html1+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
-                    html1+=`<td>${data.BookedMRP[i]}</td>`
-                    html1+=`<td>${data.BookedRevenue[i]}</td>`
-                    html1+=`<td>${data.BookedQuantity[i]}</td>`
-                    html1+=`<td>${data.RGM[i]}</td>`
-                    html1+=`<td>${data.GM[i]}</td>`
-                    html1+=`<td>${data.PredictedQuant[i]}</td>`
-                    html1+=`<td>${data.OptimalDiscount[i]}</td>`
-                    html1+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
-                    html1+=`</tr>`
+                        html1+=`<tr>`
+                        html1+=`<td id="date${[i]}">${data.Date[i]}</td>`
+                        html1+=`<td id="id${[i]}">${data.OptionID[i]}</td>`
+                        html1+=`<td id="tdisc${[i]}">${data.TradeDiscount[i]}</td>`
+                        html1+=`<td id="cdisc${[i]}">${data.CouponDiscount[i]}</td>`
+                        html1+=`<td id="disc${[i]}" >${data.TotalDiscount[i]}</td>`
+                        html1+=`<td id="bookmrp${[i]}">${data.BookedMRP[i]}</td>`
+                        html1+=`<td id="bookrev${[i]}">${data.BookedRevenue[i]}</td>`
+                        html1+=`<td id="bookquant${[i]}">${data.BookedQuantity[i]}</td>`
+                        html1+=`<td id="rgm${[i]}">${data.RGM[i]}</td>`
+                        html1+=`<td id="gm${[i]}">${data.GM[i]}</td>`
+                        html1+=`<td id="pred${[i]}">${data.PredictedQuant[i]}</td>`
+                        html1+=`<td id="optdisc${[i]}">${data.OptimalDiscount[i]}</td>`
+                        html1+=`<td><input type="number" min="-100" max="100" value="0" class="inputnumber" id="myRange${[i]}"></td>`
+                        html1+=`</tr>` 
                     }
                     console.log(html1)
                     document.querySelector("#Discount-table tbody").innerHTML = html1
                      ////////Slider
-                        for ( var i = 0; i < data.Date.length; i++) {
-                            let slider = document.getElementById(`myRange${[i]}`);
-                            let output = document.getElementById(`${[i]}`);
-                            // console.log(slider.value) // Display the default slider value
+                    //  for ( var i = 0; i < data.Date.length; i++) {
+                    //         let slider = document.getElementById(`myRange${[i]}`);
+                    //         let disc = document.getElementById(`disc${[i]}`);
+                    //         let predquant = document.getElementById(`pred${[i]}`);
 
-                            // Update the current slider value (each time you drag the slider handle)
-                            slider.oninput = function() {
+                    //         // console.log(slider.value) // Display the default slider value
+
+                    //         // Update the current slider value (each time you drag the slider handle)
+                    //         slider.oninput = function() {
+                    //             console.log(predquant)
+                    //             let idx = parseInt(this.id.substr(7))
+                    //             let initialdisc = data.TotalDiscount[idx]
+                    //             let initialpredquant= data.PredictedQuant[idx]
+                    //             let initialbookquant= data.BookedQuantity[idx]
+                    //             let delta = this.value
+                    //             disc.innerText = parseFloat(initialdisc) + parseFloat(delta)
+                    //             predquant.innerText= Math.round(parseFloat(initialbookquant)+(parseFloat(delta/100)*parseFloat(initialbookquant)))
+
                                 
-                            // output.innerHTML = this.value;
-                            console.log(output)
-                                let idx = parseInt(this.id.substr(7))
-                                let initial = data.TotalDiscount[idx]
-                                let delta = this.value
-                                output.innerText = parseFloat(initial) + parseFloat(delta)
-
-                            // console.log(this.value)
-                            }
-                            }
+                    //         // console.log(this.value)
+                    //         }
+                    //     }
                 })
       
             })
@@ -368,53 +364,150 @@
                     console.log(data)
                     let html1=''
                     for ( var i = 0; i < data.Date.length; i++) {
-                    html1+=`<tr>`
-                    html1+=`<td>${data.Date[i]}</td>`
-                    html1+=`<td>${data.OptionID[i]}</td>`
-                    html1+=`<td>${data.TradeDiscount[i]}</td>`
-                    html1+=`<td>${data.CouponDiscount[i]}</td>`
-                    html1+=`<td id="${[i]}" >${data.TotalDiscount[i]}</td>`
-                    html1+=`<td>${data.BookedMRP[i]}</td>`
-                    html1+=`<td>${data.BookedRevenue[i]}</td>`
-                    html1+=`<td>${data.BookedQuantity[i]}</td>`
-                    html1+=`<td>${data.RGM[i]}</td>`
-                    html1+=`<td>${data.GM[i]}</td>`
-                    html1+=`<td>${data.PredictedQuant[i]}</td>`
-                    html1+=`<td>${data.OptimalDiscount[i]}</td>`
-                    html1+=`<td><input type="range" min="-100" max="100" value="0" class="slider" id="myRange${[i]}"></td>`
-                    html1+=`</tr>`
+                        html1+=`<tr>`
+                        html1+=`<td id="date${[i]}">${data.Date[i]}</td>`
+                        html1+=`<td id="id${[i]}">${data.OptionID[i]}</td>`
+                        html1+=`<td id="tdisc${[i]}">${data.TradeDiscount[i]}</td>`
+                        html1+=`<td id="cdisc${[i]}">${data.CouponDiscount[i]}</td>`
+                        html1+=`<td id="disc${[i]}" >${data.TotalDiscount[i]}</td>`
+                        html1+=`<td id="bookmrp${[i]}">${data.BookedMRP[i]}</td>`
+                        html1+=`<td id="bookrev${[i]}">${data.BookedRevenue[i]}</td>`
+                        html1+=`<td id="bookquant${[i]}">${data.BookedQuantity[i]}</td>`
+                        html1+=`<td id="rgm${[i]}">${data.RGM[i]}</td>`
+                        html1+=`<td id="gm${[i]}">${data.GM[i]}</td>`
+                        html1+=`<td id="pred${[i]}">${data.PredictedQuant[i]}</td>`
+                        html1+=`<td id="optdisc${[i]}">${data.OptimalDiscount[i]}</td>`
+                        html1+=`<td><input type="number" min="-100" max="100" value="0" class="inputnumber" id="myRange${[i]}"></td>`
+                        html1+=`</tr>` 
                     }
                     console.log(html1)
                     document.querySelector("#Discount-table tbody").innerHTML = html1
                      ////////Slider
-                        for ( var i = 0; i < data.Date.length; i++) {
-                            let slider = document.getElementById(`myRange${[i]}`);
-                            let output = document.getElementById(`${[i]}`);
-                            // console.log(slider.value) // Display the default slider value
+                    //  for ( var i = 0; i < data.Date.length; i++) {
+                    //         let slider = document.getElementById(`myRange${[i]}`);
+                    //         let disc = document.getElementById(`disc${[i]}`);
+                    //         let predquant = document.getElementById(`pred${[i]}`);
 
-                            // Update the current slider value (each time you drag the slider handle)
-                            slider.oninput = function() {
+                    //         // console.log(slider.value) // Display the default slider value
+
+                    //         // Update the current slider value (each time you drag the slider handle)
+                    //         slider.oninput = function() {
+                    //             console.log(predquant)
+                    //             let idx = parseInt(this.id.substr(7))
+                    //             let initialdisc = data.TotalDiscount[idx]
+                    //             let initialpredquant= data.PredictedQuant[idx]
+                    //             let initialbookquant= data.BookedQuantity[idx]
+                    //             let delta = this.value
+                    //             disc.innerText = parseFloat(initialdisc) + parseFloat(delta)
+                    //             predquant.innerText= Math.round(parseFloat(initialbookquant)+(parseFloat(delta/100)*parseFloat(initialbookquant)))
+
                                 
-                            // output.innerHTML = this.value;
-                            console.log(output)
-                                let idx = parseInt(this.id.substr(7))
-                                let initial = data.TotalDiscount[idx]
-                                let delta = this.value
-                                output.innerText = parseFloat(initial) + parseFloat(delta)
-
-                            // console.log(this.value)
-                            }
-                            }
+                    //         // console.log(this.value)
+                    //         }
+                    //     }
                 })
             })
         })
- // headers: {
-                    //     "Content-type" : "text/csv"
-                    // },
         
     </script>
 
+<script>
+    // $(document).ready(function(){
+    window.addEventListener("DOMContentLoaded",event=>{
+        let saveButton = document.querySelector("#senddatabtn")
+        let table = document.querySelector("#Discount-table") 
+        // var tRow = table.rows[table.rows.length-1];
+        // console.log(trow)
+        // var inputs = tRow.getElementsByTagName("input");
+        var tbl = document.getElementById("Discount-table");
+        
 
+        saveButton.addEventListener("click",(event)=>{
+           var rowcount=table.rows.length
+            console.log(rowcount)
+            function storeTblValues()
+            {
+            var TableData = new Array();
+            $('#Discount-table tr').each(function(row, tr){
+                TableData[row]={
+                    "Date" : $(tr).find('td:eq(0)').text()
+                    , "OptionID" :$(tr).find('td:eq(1)').text()
+                    , "TradeDiscount" : $(tr).find('td:eq(2)').text()
+                    , "CouponDiscount" : $(tr).find('td:eq(3)').text()
+                    , "TotalDiscount" : $(tr).find('td:eq(4)').text()
+                    , "BookedMRP" : $(tr).find('td:eq(5)').text()
+                    , "BookedRevenue" : $(tr).find('td:eq(6)').text()
+                    , "BookedQuantity" : $(tr).find('td:eq(7)').text()
+                    , "RGM" : $(tr).find('td:eq(8)').text()
+                    , "GM" : $(tr).find('td:eq(9)').text()
+                    , "PredictedQuantity" : $(tr).find('td:eq(10)').text()
+                    , "OptimalDiscount" : $(tr).find('td:eq(11)').text()
+                    , "AdditionalDiscount" :  $(tr).find('input').val()
+                }
+                
+            }); 
+
+            
+            TableData.shift();
+            return TableData;
+            }
+
+                TableData = storeTblValues()
+                // console.log(TableData)
+                let options={
+                    method:"POST",
+                    body: JSON.stringify(
+                        TableData
+                    ),
+                    headers: {
+                        "Content-type" : "application/json"
+                    }
+                    
+                }
+                fetch('/dataFetch',options)
+                .then(res=>{
+                    console.log(res)
+                })
+                .then(data=>{
+                    console.log(data)
+                    if (data!=null){
+                    console.log(data)
+                    let html1=''
+                    for ( var i = 0; i < data.Date.length; i++) {
+                        html1+=`<tr>`
+                        html1+=`<td id="date${[i]}">${data.Date[i]}</td>`
+                        html1+=`<td id="id${[i]}">${data.OptionID[i]}</td>`
+                        html1+=`<td id="tdisc${[i]}">${data.TradeDiscount[i]}</td>`
+                        html1+=`<td id="cdisc${[i]}">${data.CouponDiscount[i]}</td>`
+                        html1+=`<td id="disc${[i]}" >${data.TotalDiscount[i]}</td>`
+                        html1+=`<td id="bookmrp${[i]}">${data.BookedMRP[i]}</td>`
+                        html1+=`<td id="bookrev${[i]}">${data.BookedRevenue[i]}</td>`
+                        html1+=`<td id="bookquant${[i]}">${data.BookedQuantity[i]}</td>`
+                        html1+=`<td id="rgm${[i]}">${data.RGM[i]}</td>`
+                        html1+=`<td id="gm${[i]}">${data.GM[i]}</td>`
+                        html1+=`<td id="pred${[i]}">${data.PredictedQuant[i]}</td>`
+                        html1+=`<td id="optdisc${[i]}">${data.OptimalDiscount[i]}</td>`
+                        html1+=`<td><input type="number" min="-100" max="100" value="${data.AdditionalDiscount[i]}" class="inputnumber" id="myRange${[i]}"></td>`
+                        html1+=`</tr>`
+                    }
+                    console.log(html1)
+                    document.querySelector("#Discount-table tbody").innerHTML = html1
+                }
+                })
+
+
+
+                // fetch('/datafinal')
+                // .then(res=>{
+                //     console.log(res)
+                // })
+                
+
+        })
+//    })
+});
+
+</script>
 
     <style>
         th,
@@ -539,6 +632,11 @@
         #uploadsec td {
             padding-left: 250px;
             padding-right: 200px;
+        }
+
+        .inputnumber{
+            margin-top: 4px;
+            width: 100px;
         }
     </style>
 </body>

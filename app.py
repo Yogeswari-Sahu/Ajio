@@ -13,28 +13,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 MASTERDATA='ajiomaster_ak1.csv'
 
-# def transform(text_file_contents):
-#     return text_file_contents.replace("=", ",")
-# df = pd.read_csv(MASTERDATA)
-# df['Date']=df['Date'].astype(str)
-# df['OptionID']=df['OptionID'].astype(int)
-# df['TradeDiscount']=df['TradeDiscount'].astype(float)
-# df['CouponDiscount']=df['CouponDiscount'].astype(float)
-# df['TotalDiscount']=df['TotalDiscount'].astype(float)
-# df['BookedMRP']=df['BookedMRP'].astype(float)
-# df['BookedRevenue']=df['BookedRevenue'].astype(float)
-# df['BookedQuantity']=df['BookedQuantity'].astype(int)
-# df['RGM']=df['RGM'].astype(int)
-# df['GM']=df['GM'].astype(int)
-# df['PredictedQuant']=df['PredictedQuant'].astype(int)
-# df['OptimalDiscount']=df['OptimalDiscount'].astype(float)
-# df['Segment']=df['Segment'].astype(str)
-# df['Brand']=df['Brand'].astype(str)
-# df['Ageing']=df['Ageing'].astype(int)
-# df['Portfolio']=df['Portfolio'].astype(str)
-# df['Brick']=df['Brick'].astype(str)
-
-
 df = pd.read_csv(MASTERDATA)
 
 # print(df.shape)
@@ -49,7 +27,7 @@ df['TradeDiscount'] = df['TradeDiscount'].astype(float)
 df['CouponDiscount'] = df['CouponDiscount'].astype(float)
 df['TotalDiscount'] = df['TotalDiscount'].astype(float)
 df['OptionID'] = df['OptionID'].astype(str)
-print(df.dtypes)
+# print(df.dtypes)
 
 @app.route('/')
 def index():
@@ -208,33 +186,8 @@ def datafromcsv():
         # f=request.form['filename']
         # print(request.body)
         f = request.files['filename']
-        # xlsx_sig = b'\x50\x4B\x05\06'
-        # xls_sig = b'\x09\x08\x10\x00\x00\x06\x05\x00'
-
-        # filenames = [
-        #     ('spreadsheet.xls', 0, 512, 8),
-        #     ('spreadsheet.xlsx', 2, -22, 4)]
-
-        # for filename, whence, offset, size in filenames:
-        #     with open(filename, 'rb') as f:
-        #         f.seek(offset, whence) # Seek to the offset.
-        #         bytes = f.read(size)   # Capture the specified number of bytes.
-
-        #         print(codecs.getencoder('hex')(bytes))
-
-        #         if bytes == xls_sig:
-        #             msg = '"{}" is an xls.'
-        #         elif bytes == xlsx_sig:
-        #             msg = '"{}" is an xlsx.'
-        #         else:
-        #             msg = '"{}" is not an Excel document.'
-        #         print(msg.format(filename))
-        # print(f)
         f.save(os.path.join(app.config['UPLOAD_FOLDER'], 'xyz.csv'))
         datacsv=[]
-        #for row in z:
-        #        datacsv.append(row)
-        #print(datacsv)
         with open(os.path.join(app.config['UPLOAD_FOLDER'],'xyz.csv')) as file:
             csvfile = csv.reader(file)
             for row in csvfile:
@@ -245,6 +198,38 @@ def datafromcsv():
         dffiltered=dffiltered.to_dict(orient='list')
         print(dffiltered)
         return json.dumps(dffiltered)
+
+datalist=[]
+d = {}
+@app.route('/dataFetch',methods=["GET","POST"])
+def dataFetch():
+    # print(request.get_json())
+    datalist.append(request.json)
+    # print(request.json())
+    if len(datalist)>=3:
+        del datalist[0]
+    print(datalist)
+    # datalist=dict(datalist)
+    print(datalist)
+    print(datalist[0])
+    # datalist[1][0]['PredictedQuantity']
+    if len(datalist)==2:
+        ds = datalist[1]
+        for i in ds:
+            i['PredictedQuantity']=int(i['BookedQuantity'])+round(float(int(i['AdditionalDiscount'])/100)*float(i['BookedQuantity']))
+            i['TotalDiscount']=i['TotalDiscount']+i['AdditionalDiscount']
+        for i in ds: 
+            for k in i.keys():
+                d[k] = list(d[k] for d in ds)
+        print(d)
+        return json.dumps(d)
+    else:
+        return json.dumps({'hey'})
+    
+# @app.route('/datafinal',methods=["GET","POST"])
+# def datafinal():
+#     print(d)
+#     return json.dumps(d)
 
 
 if __name__ == "__main__":
